@@ -103,14 +103,10 @@ answer_input = prompt.replace("{context}", context).replace("{question}", "如�
 ## 6. 目录结构
 
 ```
-project_1/
+RAG_Hash_based/
 ├── rag/                     # 核心代码（11 个模块，逐行中文注释）
 ├── tests/                   # 离线 unittest 自动化测试
-├── data/knowledge_base/     # 示例知识库（md / txt / json）
 ├── data/index.json          # 构建出的向量索引（可删除后重新 ingest）
-├── prompts/                 # Agent 系统提示词与答案模板
-├── skills/deepseek-rag/     # Agent Skill 与工具 schema
-└── docs/                    # 00 契约 ~ 07 注释规范（需求/架构/测试/纪要）
 ```
 
 ## 7. 配置与参数
@@ -154,34 +150,9 @@ python -m rag.cli ingest data/knowledge_base --rebuild --embedder openai --dim 1
 ```bash
 python -m unittest discover -s tests -t . -v       # 93 条用例，全部通过，约 0.54 秒
 python -m compileall rag                            # 语法检查
-```
 
-| 验收项 | 状态 |
-| --- | --- |
-| AC1 自动化测试全绿 | ✅ 93 条用例 100% 通过（0.54s、离线、0 第三方依赖），见 [docs/05_test_report.md](docs/05_test_report.md) |
-| AC2 示例库 ingest + query + context 引用 | ✅ 冒烟通过 |
-| AC3 工具参数校验与 `results` 结构 | ✅ |
-| AC4 CLI 子命令与退出码 0/1/2 | ✅ |
-| AC5 无网络、无 API Key 全链路可跑 | ✅ |
-| AC6 零第三方依赖 | ✅（AST 扫描仅标准库 + `rag`） |
-| AC7 文档、prompt、Skill 齐全 | ✅ |
 
-## 10. 文档索引
-
-| 文档 | 内容 |
-| --- | --- |
-| [docs/00_project_brief.md](docs/00_project_brief.md) | **权威契约**：需求确认、范围、验收标准、接口签名、索引格式、工具协议 |
-| [docs/01_requirements.md](docs/01_requirements.md) | 需求文档：用户故事、FR/NFR、范围外、AC、需求追踪矩阵 |
-| [docs/02_project_plan.md](docs/02_project_plan.md) | 项目计划：里程碑、分工、依赖图、DoD、v0.2 backlog |
-| [docs/03_architecture.md](docs/03_architecture.md) | 架构设计：分层、数据流、ADR、异常边界、容量与演进 |
-| [docs/04_test_plan.md](docs/04_test_plan.md) | 测试方案：策略、90 条用例设计、覆盖矩阵、准入门槛 |
-| [docs/05_test_report.md](docs/05_test_report.md) | 测试报告：执行结果、缺陷与修复、结论 |
-| [docs/06_meeting_minutes.md](docs/06_meeting_minutes.md) | 会议室讨论纪要与决议（产品/架构/代码/注释/测试/AI） |
-| [docs/07_comment_guideline.md](docs/07_comment_guideline.md) | 逐行中文注释规范与自检方法 |
-
-## 11. 已知限制与 v0.2 方向
-
-**v0.1 明确不做**：PDF/OCR、增量索引与文件监听、rerank、多租户/权限、HTTP 服务、Web/GUI、答案生成（由 Agent 大模型完成）。
+## 10. 已知限制
 
 已知限制：
 
@@ -189,5 +160,3 @@ python -m compileall rag                            # 语法检查
 - 纯 Python 余弦在万级片段内可接受；每次工具调用 `Rag()` 会重新加载 JSON 索引，超大索引需服务化/缓存。
 - 仅 `.md` / `.markdown` / `.txt` / `.json`；JSON 顶层需为数组或 `{"items": [...]}`。
 - 片段重叠按字符截取：相邻片段开头可能是上一片段的半句（例如“装与依赖”），这是保证答案不被切断的代价，不影响检索与引用；追求更整齐可把 `chunk_overlap` 调小（如 0~40）。
-
-v0.2 backlog：PDF 解析、增量索引、真实嵌入联调、rerank / 混合检索、HTTP 检索服务、评测集与召回指标。
