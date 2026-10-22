@@ -1,0 +1,6 @@
+data/
+docs/
+prompts/
+skills/
+*.json
+*.env
